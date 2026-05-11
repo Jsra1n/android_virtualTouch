@@ -59,6 +59,7 @@
 #include <string>
 #include <vector>
 #include <random> // 引入随机数库
+#include <unistd.h>
 #include <chrono>
 #include "tools.h"
 
