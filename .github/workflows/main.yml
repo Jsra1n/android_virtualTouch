@@ -13,15 +13,17 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v4
 
+    # 替换掉报错的部分，直接使用系统自带的 NDK
     - name: 配置 Android NDK
-      uses: nwtgck/actions-setup-ndk@v1
-      with:
-        ndk-version: r27c 
+      run: |
+        echo "ANDROID_NDK_HOME=${ANDROID_SDK_ROOT}/ndk-bundle" >> $GITHUB_ENV
+        # 如果需要特定版本，Ubuntu 镜像通常自带多个版本，
+        # 我们这里直接使用默认路径，或者让 CMake 自动寻找
 
     - name: 配置 CMake (Android 交叉编译)
       run: |
         cmake -B ${{github.workspace}}/build \
-          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+          -DCMAKE_TOOLCHAIN_FILE=${ANDROID_SDK_ROOT}/ndk-bundle/build/cmake/android.toolchain.cmake \
           -DANDROID_ABI=arm64-v8a \
           -DANDROID_PLATFORM=android-24 \
           -DCMAKE_BUILD_TYPE=Release
