@@ -63,55 +63,81 @@
 #include <chrono>
 #include "tools.h"
 
-int main(int argc, char* argv[]) {
-    touch touchInstance;
+// int main(int argc, char* argv[]) {
+//     touch touchInstance;
 
-    if (argc < 2) {
-        std::cout << "使用方法:" << std::endl;
-        std::cout << "  点击: ./touch tap x y" << std::endl;
-        std::cout << "  滑动: ./touch swipe x1 y1 x2 y2 duration_ms" << std::endl;
-        return 0;
-    }
+//     if (argc < 2) {
+//         std::cout << "使用方法:" << std::endl;
+//         std::cout << "  点击: ./touch tap x y" << std::endl;
+//         std::cout << "  滑动: ./touch swipe x1 y1 x2 y2 duration_ms" << std::endl;
+//         return 0;
+//     }
 
-    std::string cmd = argv[1];
+//     std::string cmd = argv[1];
 
-    // 初始化随机数生成器
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    // 定义 45 到 60 之间的均匀分布
-    std::uniform_int_distribution<> dis(45, 60);
+//     // 初始化随机数生成器
+//     std::random_device rd;
+//     std::mt19937 gen(rd());
+//     // 定义 45 到 60 之间的均匀分布
+//     std::uniform_int_distribution<> dis(45, 60);
 
-    if (cmd == "tap" && argc == 4) {
-        float x = std::stof(argv[2]);
-        float y = std::stof(argv[3]);
+//     if (cmd == "tap" && argc == 4) {
+//         float x = std::stof(argv[2]);
+//         float y = std::stof(argv[3]);
         
-        // 生成随机时长
-        int random_sleep = dis(gen);
+//         // 生成随机时长
+//         int random_sleep = dis(gen);
 
-        touchInstance.touchDown(0, {x, y});
+//         touchInstance.touchDown(0, {x, y});
         
-        // usleep 的参数是微秒 (1毫秒 = 1000微秒)
-        usleep(random_sleep * 1000); 
+//         // usleep 的参数是微秒 (1毫秒 = 1000微秒)
+//         usleep(random_sleep * 1000); 
         
-        touchInstance.touchUp(0);
+//         touchInstance.touchUp(0);
         
-        std::cout << "已执行点击: (" << x << ", " << y << ") 时长: " << random_sleep << "ms" << std::endl;
+//         std::cout << "已执行点击: (" << x << ", " << y << ") 时长: " << random_sleep << "ms" << std::endl;
 
-    } else if (cmd == "swipe" && argc == 7) {
-        float x1 = std::stof(argv[2]), y1 = std::stof(argv[3]);
-        float x2 = std::stof(argv[4]), y2 = std::stof(argv[5]);
-        int duration = std::stoi(argv[6]);
+//     } else if (cmd == "swipe" && argc == 7) {
+//         float x1 = std::stof(argv[2]), y1 = std::stof(argv[3]);
+//         float x2 = std::stof(argv[4]), y2 = std::stof(argv[5]);
+//         int duration = std::stoi(argv[6]);
 
-        touchInstance.touchDown(0, {x1, y1});
-        for (int i = 0; i <= 20; i++) {
-            float currX = x1 + (x2 - x1) * i / 20.0;
-            float currY = y1 + (y2 - y1) * i / 20.0;
-            touchInstance.touchMove(0, {currX, currY});
-            usleep(duration * 1000 / 20); 
+//         touchInstance.touchDown(0, {x1, y1});
+//         for (int i = 0; i <= 20; i++) {
+//             float currX = x1 + (x2 - x1) * i / 20.0;
+//             float currY = y1 + (y2 - y1) * i / 20.0;
+//             touchInstance.touchMove(0, {currX, currY});
+//             usleep(duration * 1000 / 20); 
+//         }
+//         touchInstance.touchUp(0);
+//         std::cout << "已执行滑动" << std::endl;
+//     }
+
+//     return 0;
+// }
+
+
+
+int main() {
+    // 1. 只在这里初始化一次，虽然启动慢，但只慢这一次
+    touch touchInstance; 
+    std::cout << "READY" << std::endl; // 打印 READY 表示 4秒初始化完了
+
+    std::string line;
+    // 2. 进入循环，等待输入
+    while (std::getline(std::cin, line)) {
+        std::stringstream ss(line);
+        std::string cmd;
+        ss >> cmd;
+        if (cmd == "tap") {
+            float x, y;
+            ss >> x >> y;
+            // 此时执行点击，响应时间是微秒级的
+            touchInstance.touchDown(0, {x, y});
+            usleep(50000); // 50ms
+            touchInstance.touchUp(0);
+            std::cout << "DONE" << std::endl;
         }
-        touchInstance.touchUp(0);
-        std::cout << "已执行滑动" << std::endl;
     }
-
     return 0;
 }
